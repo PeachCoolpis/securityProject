@@ -16,15 +16,17 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
     
+    private final String[] resource = {"/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*"};
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         
         http
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(resource).permitAll()
                         .requestMatchers("/").permitAll()
                         .anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults())
+                .formLogin(form -> form.loginPage("/login").permitAll()) // 로그인 페이지를 따로만들었으면 로그아웃도 따로 만들어줘야함 /logout 따로 안만들면 404뜸
                 
         ;
         
