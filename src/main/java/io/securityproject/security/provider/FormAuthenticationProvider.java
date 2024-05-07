@@ -1,5 +1,6 @@
 package io.securityproject.security.provider;
 
+import io.securityproject.security.details.FormAuthenticationDetails;
 import io.securityproject.users.dto.AccountContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -30,6 +31,14 @@ public class FormAuthenticationProvider implements AuthenticationProvider {
         if (!passwordEncoder.matches(password, accountContext.getPassword())) {
             throw new BadCredentialsException("비밀번호 불일치");
         }
+        
+        FormAuthenticationDetails formAuthenticationDetails = (FormAuthenticationDetails) authentication.getDetails();
+        // authentication.getDetails 안에  WebAuthenticationDetails 가 저장되어있음 이건 따로 복습이 필요함
+        String secretKey = formAuthenticationDetails.getSecretKey();
+        if (!"secret".equals(secretKey)) {
+            throw new BadCredentialsException("시크릿키 안맞음");
+        }
+        
         return new UsernamePasswordAuthenticationToken(accountContext.getAccountDto(),null,accountContext.getAuthorities());
     }
     
