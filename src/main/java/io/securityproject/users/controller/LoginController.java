@@ -1,4 +1,4 @@
-package io.securityproject.controller;
+package io.securityproject.users.controller;
 
 
 import org.springframework.stereotype.Controller;
@@ -10,5 +10,10 @@ public class LoginController {
     @GetMapping("/login")
     public String login() {
         return "login/login";
+    }
+    
+    @GetMapping("/signup")
+    public String signup() {
+        return "login/signup";
     }
 }
