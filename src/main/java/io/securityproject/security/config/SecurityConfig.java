@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 @EnableWebSecurity
@@ -25,7 +26,7 @@ public class SecurityConfig {
     
     private final AuthenticationProvider authenticationProvider;
     private final AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource;
-    
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         
@@ -37,6 +38,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login").permitAll()
                         .authenticationDetailsSource(authenticationDetailsSource)
+                        .successHandler(authenticationSuccessHandler)
                 )// 로그인 페이지를 따로만들었으면 로그아웃도 따로 만들어줘야함 /logout 따로 안만들면 404뜸
                 .logout(logout -> logout.logoutUrl("/logout").permitAll())
                 .authenticationProvider(authenticationProvider)
