@@ -30,10 +30,11 @@ public class SecurityConfig {
                         .requestMatchers(resource).permitAll()
                         .requestMatchers("/signup","/").permitAll()
                         .anyRequest().authenticated())
-                .formLogin(form -> form.loginPage("/login").permitAll()
-                
-                ) // 로그인 페이지를 따로만들었으면 로그아웃도 따로 만들어줘야함 /logout 따로 안만들면 404뜸
+                .formLogin(form -> form
+                        .loginPage("/login").permitAll())// 로그인 페이지를 따로만들었으면 로그아웃도 따로 만들어줘야함 /logout 따로 안만들면 404뜸
+                .logout(logout -> logout.logoutUrl("/logout").permitAll())
                 .authenticationProvider(authenticationProvider)
+        
         ;
         
         
