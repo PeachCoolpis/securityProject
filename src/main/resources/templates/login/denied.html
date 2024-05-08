@@ -58,7 +58,7 @@
             color: #fff; /* 마우스 오버시 글자색 */
         }
         /* 중앙 로그인 폼 스타일 */
-        .signup-form {
+        .login-form {
             max-width: 400px;
             margin: 30px auto;
             padding: 20px;
@@ -66,16 +66,16 @@
             border-radius: 5px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
         }
-        .signup-form h2 {
+        .login-form h2 {
             color: #fff; /* 밝은 글자색 */
             margin-bottom: 20px;
         }
-        .signup-form .form-control {
+        .login-form .form-control {
             background-color: #3a3b45; /* 어두운 입력 필드 배경색 */
             color: #fff; /* 밝은 입력 필드 글자색 */
             border: none;
         }
-        .signup-form .btn-primary {
+        .login-form .btn-primary {
             background-color: #4e73df; /* 밝은 버튼 색상 */
             border: none;
         }
@@ -92,31 +92,10 @@
             <div th:replace="~{layout/sidebar::sidebar}"></div>
         </div>
         <div class="col-md-10 content">
-            <div class="signup-form">
-                <h2>Sign Up</h2>
-                <form th:action="@{/signup}" method="post">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="age">Age</label>
-                        <input type="number" class="form-control" id="age" name="age" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="roles">Authority</label>
-                        <select class="form-control" id="roles" name="roles">
-                            <option>ROLE_USER</option>
-                            <option>ROLE_MANAGER</option>
-                            <option>ROLE_ADMIN</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Sign Up</button>
-                </form>
+            <div>
+                <h3 th:text="${exception}"></h3>
+                <br />
+                <span th:text="${username} != null ? ${username} + ' 님은 접근 권한이 없습니다' : '비 정상적인 접근입니다'" ></span>
             </div>
         </div>
     </div>

@@ -1,6 +1,7 @@
 package io.securityproject.security.config;
 
 
+import io.securityproject.security.handler.FormAccessDeniedHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +37,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(resource).permitAll()
                         .requestMatchers("/","/signup","/login*").permitAll()
+                        .requestMatchers("/user").hasAuthority("ROLE_USER")
+                        .requestMatchers("/manager").hasAuthority("ROLE_MANAGER")
+                        .requestMatchers("/admin").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login").permitAll()
@@ -45,6 +49,9 @@ public class SecurityConfig {
                 )// 로그인 페이지를 따로만들었으면 로그아웃도 따로 만들어줘야함 /logout 따로 안만들면 404뜸
                 .logout(logout -> logout.logoutUrl("/logout").permitAll())
                 .authenticationProvider(authenticationProvider)
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(new FormAccessDeniedHandler("/denied"))
+                )
         
         ;
         

@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class LoginController {
     
     @GetMapping("/login")
-    public String login(@RequestParam(value = "error",required = false) String error
-                       , @RequestParam(value = "exception",required = false) String exception
-                       , Model model
-                        ) {
+    public String login(@RequestParam(value = "error", required = false) String error
+            , @RequestParam(value = "exception", required = false) String exception
+            , Model model
+    ) {
         model.addAttribute("error", error);
         model.addAttribute("exception", exception);
         return "login/login";
@@ -31,6 +31,7 @@ public class LoginController {
     
     /**
      * Get 방식 로그아웃  SecurityContextLogoutHandler 내부에서 세션 무효화 및 authentication도 null로 만듬
+     *
      * @param request
      * @param response
      * @return
@@ -39,7 +40,7 @@ public class LoginController {
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
         if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request,response,authentication);
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
         return "redirect:/login";
     }
