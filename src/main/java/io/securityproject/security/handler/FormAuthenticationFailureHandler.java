@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
+@Component(value = "formAuthenticationFailureHandler")
 public class FormAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
     
     @Override
