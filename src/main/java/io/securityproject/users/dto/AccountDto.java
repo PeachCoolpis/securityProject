@@ -2,9 +2,14 @@ package io.securityproject.users.dto;
 
 
 import io.securityproject.users.entity.Account;
+import io.securityproject.users.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +20,7 @@ public class AccountDto {
     private String username;
     private String password;
     private int age;
-    private String roles;
+    private List<String> roles;
     
     
     public static AccountDto createAccountDto(Account account) {
@@ -24,7 +29,9 @@ public class AccountDto {
         accountDto.username = account.getUsername();
         accountDto.password = account.getPassword();
         accountDto.age = account.getAge();
-        accountDto.roles = account.getRoles();
+        accountDto.roles = account.getUserRoles().stream()
+                .map(Role::getRoleName)
+                .collect(Collectors.toList());
         return accountDto;
     }
 }
