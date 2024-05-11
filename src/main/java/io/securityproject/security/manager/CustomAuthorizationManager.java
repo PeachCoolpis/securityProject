@@ -1,14 +1,16 @@
 package io.securityproject.security.manager;
 
-import io.securityproject.security.mapper.MapBasedUrlRoleMapper;
+import io.securityproject.admin.repository.ResourcesRepository;
+import io.securityproject.security.mapper.PersistentUrlRoleMapper;
 import io.securityproject.security.service.DynamicAuthorizationService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.log.LogMessage;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.access.expression.DefaultHttpSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
@@ -27,13 +29,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CustomAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
     
-    private static final AuthorizationDecision DENY = new AuthorizationDecision(false);
+    private static final AuthorizationDecision ACCESS = new AuthorizationDecision(true);
+   // private static final AuthorizationDecision ACCESS = new AuthorizationDecision(false);
     private final HandlerMappingIntrospector handlerMappingIntrospector;
     private List<RequestMatcherEntry<AuthorizationManager<RequestAuthorizationContext>>> mappings;
-    
+    private final ResourcesRepository repository;
+    private final RoleHierarchyImpl roleHierarchy;
+    DynamicAuthorizationService dynamicAuthorizationService;
     @PostConstruct
     public void mapping() {
-        DynamicAuthorizationService dynamicAuthorizationService = new DynamicAuthorizationService(new MapBasedUrlRoleMapper());
+        dynamicAuthorizationService = new DynamicAuthorizationService(new PersistentUrlRoleMapper(repository));
+        setMapping();
+        
+    }
+    
+    private void setMapping() {
         Map<String, String> urlRoleMappings = dynamicAuthorizationService.getUrlRoleMappings();
         mappings = urlRoleMappings
                 .entrySet().stream()
@@ -41,7 +51,6 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
                         new MvcRequestMatcher(handlerMappingIntrospector, e.getKey()),
                         customAuthorizationManager(e.getValue())
                 )).collect(Collectors.toList());
-        
     }
     
     
@@ -58,7 +67,7 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
             }
         }
         
-        return DENY;
+        return ACCESS;
     }
     
     /**
@@ -69,9 +78,16 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
     private AuthorizationManager<RequestAuthorizationContext> customAuthorizationManager(String role) {
         if (role != null) {
             if (role.startsWith("ROLE")) {
-                return AuthorityAuthorizationManager.hasAuthority(role);
+                AuthorityAuthorizationManager<RequestAuthorizationContext> authorizationManager =
+                        AuthorityAuthorizationManager.hasAuthority(role);
+                authorizationManager.setRoleHierarchy(roleHierarchy);
+                return authorizationManager;
             }else {
-                return new WebExpressionAuthorizationManager(role);
+                DefaultHttpSecurityExpressionHandler handler =  new DefaultHttpSecurityExpressionHandler();
+                handler.setRoleHierarchy(roleHierarchy);
+                WebExpressionAuthorizationManager authorizationManager = new WebExpressionAuthorizationManager(role);
+                authorizationManager.setExpressionHandler(handler);
+                return authorizationManager;
             }
         }
         return null;
@@ -80,5 +96,10 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
     @Override
     public void verify(Supplier<Authentication> authentication, RequestAuthorizationContext object) {
         AuthorizationManager.super.verify(authentication, object);
+    }
+    
+    public synchronized void reload() {
+        this.mappings.clear();
+        setMapping();
     }
 }

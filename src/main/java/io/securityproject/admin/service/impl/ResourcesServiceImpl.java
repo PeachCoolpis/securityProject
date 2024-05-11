@@ -3,6 +3,7 @@ package io.securityproject.admin.service.impl;
 
 import io.securityproject.admin.repository.ResourcesRepository;
 import io.securityproject.admin.service.ResourcesService;
+import io.securityproject.security.manager.CustomAuthorizationManager;
 import io.securityproject.users.entity.Resources;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ResourcesServiceImpl implements ResourcesService {
 
     private final ResourcesRepository resourcesRepository;
+    private final CustomAuthorizationManager authorizationManager;
 
     @Transactional
     public Resources getResources(long id) {
@@ -32,10 +34,12 @@ public class ResourcesServiceImpl implements ResourcesService {
     @Transactional
     public void createResources(Resources resources){
         resourcesRepository.save(resources);
+        authorizationManager.reload();
     }
 
     @Transactional
     public void deleteResources(long id) {
         resourcesRepository.deleteById(id);
+        authorizationManager.reload();
     }
 }

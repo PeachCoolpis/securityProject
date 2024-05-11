@@ -16,21 +16,28 @@ public class HomeController {
 	
 	@GetMapping(value = "/user")
 	public String user() {
-		return "/user";
+		
+		return "user";
 	}
 	
 	@GetMapping(value = "/manager")
 	public String manager() {
-		return "/manager";
+		
+		return "manager";
 	}
 	
 	@GetMapping(value = "/admin")
 	public String admin() {
-		return "/admin";
+		return "admin";
 	}
 	
+	@GetMapping(value = "/db")
+	public String db() {
+		return "db";
+	}
 	@GetMapping("/api")
 	public String restDashBoard() {
+		
 		return "rest/dashboard";
 	}
 }
